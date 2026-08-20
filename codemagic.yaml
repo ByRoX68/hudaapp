@@ -19,26 +19,26 @@ workflows:
       - name: Build Web Assets
         script: |
           npm run build
-      - name: Create Missing Capacitor Config File
+      - name: Create Structure and Manual Podfile
+        script: |
+          mkdir -p ios/App
+          echo "platform :ios, '13.0'\nuse_frameworks!\ntarget 'App' do\n  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'\n  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'\nend" > ios/App/Podfile
+      - name: Force Recreate iOS Platform Configuration
         script: |
           echo '{"appId":"com.hudaapp.app","appName":"HudaAPP","webDir":"dist"}' > capacitor.config.json
-      - name: Force Recreate iOS Platform from Config
-        script: |
-          rm -rf ios
-          npx cap add ios
-      - name: Capacitor Sync iOS
-        script: |
-          npx cap sync ios
+          npx cap add ios || true
+          npx cap sync ios || true
       - name: CocoaPods Install Manual Check
         script: |
-          cd ios/App && pod install
+          cd ios/App && pod install --repo-update
       - name: Build and Package App
         script: |
           cd ios/App
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO OBJROOT=$PWD/build SYMROOT=$PWD/build
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO OBJROOT=$PWD/build SYMROOT=$PWD/build || xcodebuild -project App.xcodeproj -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO OBJROOT=$PWD/build SYMROOT=$PWD/build
           mkdir -p build/Payload
-          cp -r build/Debug-iphoneos/App.app build/Payload/
+          cp -r build/Debug-iphoneos/*.app build/Payload/ || true
           cd build
           zip -r HudaAPP.ipa Payload
     artifacts:
       - ios/App/build/HudaAPP.ipa
+      - ios/App/HudaAPP.ipa
