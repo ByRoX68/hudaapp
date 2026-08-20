@@ -19,10 +19,13 @@ workflows:
       - name: Build Web Assets
         script: |
           npm run build
-      - name: Force Recreate iOS Platform
+      - name: Create Missing Capacitor Config File
+        script: |
+          echo '{"appId":"com.hudaapp.app","appName":"HudaAPP","webDir":"dist"}' > capacitor.config.json
+      - name: Force Recreate iOS Platform from Config
         script: |
           rm -rf ios
-          npx cap add ios --ext-config capacitor.config.json || npx cap add ios
+          npx cap add ios
       - name: Capacitor Sync iOS
         script: |
           npx cap sync ios
