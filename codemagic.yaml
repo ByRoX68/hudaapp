@@ -11,25 +11,26 @@ workflows:
       events:
         - push
     scripts:
-      - name: Install dependencies
-        script: | 
+      - name: Install Core Dependencies
+        script: |
           npm install
-          npm install @capacitor/ios
-      - name: Build web assets
-        script: | 
+          npm install -g @capacitor/cli
+          npm install @capacitor/core @capacitor/ios @capacitor/geolocation @capacitor/haptics @capacitor/local-notifications
+      - name: Build Web Assets
+        script: |
           npm run build
-      - name: Recreate Fresh iOS Platform
-        script: | 
+      - name: Force Recreate iOS Platform
+        script: |
           rm -rf ios
-          npx cap add ios
+          npx cap add ios --ext-config capacitor.config.json || npx cap add ios
       - name: Capacitor Sync iOS
-        script: | 
+        script: |
           npx cap sync ios
-      - name: CocoaPods Install
-        script: | 
+      - name: CocoaPods Install Manual Check
+        script: |
           cd ios/App && pod install
       - name: Build and Package App
-        script: | 
+        script: |
           cd ios/App
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO OBJROOT=$PWD/build SYMROOT=$PWD/build
           mkdir -p build/Payload
