@@ -18,6 +18,10 @@ workflows:
       - name: Build web assets
         script: | 
           npm run build
+      - name: Recreate Fresh iOS Platform
+        script: | 
+          rm -rf ios
+          npx cap add ios
       - name: Capacitor Sync iOS
         script: | 
           npx cap sync ios
