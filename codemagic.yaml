@@ -22,7 +22,14 @@ workflows:
       - name: Create Structure and Manual Podfile
         script: |
           mkdir -p ios/App
-          echo "platform :ios, '13.0'\nuse_frameworks!\ntarget 'App' do\n  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'\n  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'\nend" > ios/App/Podfile
+          cat << 'EOF' > ios/App/Podfile
+          platform :ios, '13.0'
+          use_frameworks!
+          target 'App' do
+            pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
+            pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+          end
+          EOF
       - name: Force Recreate iOS Platform Configuration
         script: |
           echo '{"appId":"com.hudaapp.app","appName":"HudaAPP","webDir":"dist"}' > capacitor.config.json
