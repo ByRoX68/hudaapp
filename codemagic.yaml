@@ -21,13 +21,16 @@ workflows:
       - name: Capacitor Sync iOS
         script: | 
           npx cap sync ios
-      - name: Build Unsigned iOS Application
+      - name: CocoaPods Install
+        script: | 
+          cd ios/App && pod install
+      - name: Build and Package App
         script: | 
           cd ios/App
           xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO OBJROOT=$PWD/build SYMROOT=$PWD/build
-          mkdir -p $PWD/build/Payload
-          cp -r $PWD/build/Debug-iphoneos/App.app $PWD/build/Payload
-          cd $PWD/build
-          zip -qr HudaAPP.ipa Payload
+          mkdir -p build/Payload
+          cp -r build/Debug-iphoneos/App.app build/Payload/
+          cd build
+          zip -r HudaAPP.ipa Payload
     artifacts:
-      - ios/App/build/*.ipa
+      - ios/App/build/HudaAPP.ipa
